@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pab-algorithm"
+version = "0.1.0"
+description = ""
+authors = ["pointsarebad <dan.gawne@outlook.com>"]
+readme = "README.md"
+packages = [{include = "pab_algorithm", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.2"
+numpy = "^1.26.4"
+requests = "^2.32.3"
+scikit-learn = "^1.5.0"
+scipy = "^1.13.1"
+fastapi = "^0.111.0"
+mypy = "^1.10.0"
+ruff = "^0.4.8"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
