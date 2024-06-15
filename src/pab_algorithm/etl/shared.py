@@ -62,7 +62,7 @@ def add_scoring_power(df_set_elos: pd.DataFrame) -> pd.DataFrame:
     df_power = (
         df_set_elos[["code", "scored"]]
         .groupby("code")
-        .mean("scored")
+        .mean()
         .reset_index()
         .rename(columns={"scored": "power"})
     )
@@ -74,3 +74,55 @@ def add_scoring_power(df_set_elos: pd.DataFrame) -> pd.DataFrame:
         left_on="code",
         right_on="code",
     )
+
+
+def set_elos(
+    df_combined: pd.DataFrame,
+    df_elo: pd.DataFrame,
+    min_year: int | str | None = None,
+    max_goals: int | None = None,
+) -> pd.DataFrame:
+    if min_year is None:
+        years = set(df_elo.columns)
+    else:
+        years = {c for c in df_elo.columns if c >= str(min_year)}
+
+    countries = set(df_elo.index)
+
+    df_filtered = df_combined[
+        df_combined["year"].isin(years)
+        & df_combined["home"].isin(countries)
+        & df_combined["away"].isin(countries)
+    ]
+
+    df_filtered.loc[:, "home_elo"] = df_filtered.apply(
+        lambda row: df_elo.loc[row["home"], row["year"]], axis=1
+    )
+    df_filtered.loc[:, "away_elo"] = df_filtered.apply(
+        lambda row: df_elo.loc[row["away"], row["year"]], axis=1
+    )
+
+    df_filtered = df_filtered.dropna()
+
+    df_home = pd.DataFrame({
+        "code": df_filtered["home"],
+        "home": df_filtered["home_elo"].astype(int),
+        "away": df_filtered["away_elo"].astype(int),
+        "is_friendly": df_filtered["is_friendly"].astype(bool),
+        "scored": df_filtered["home_score"].astype(int),
+    })
+
+    df_away = pd.DataFrame({
+        "code": df_filtered["away"],
+        "home": df_filtered["away_elo"].astype(int),
+        "away": df_filtered["home_elo"].astype(int),
+        "is_friendly": df_filtered["is_friendly"].astype(bool),
+        "scored": df_filtered["away_score"].astype(int),
+    })
+
+    df_set_elos = pd.concat([df_home, df_away], ignore_index=True)
+
+    if max_goals and max_goals > 0:
+        df_set_elos = df_set_elos[df_set_elos["scored"] <= max_goals]
+
+    return df_set_elos

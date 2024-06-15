@@ -1,19 +1,14 @@
 import pickle
-from typing import TypeAlias
 
+import numpy.typing as npt
 import pandas as pd
-from numpy import float_, ndarray
+from numpy import float64
 from pab_algorithm.config import TrainingSettings, linear_params, train_settings
+from pab_algorithm.data_types import LinearDatasets
 from pab_algorithm.etl import load_data
 from pab_algorithm.etl.training_dataset_pipeline import run_dataset_pipeline
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
-
-LinearFeature: TypeAlias = ndarray[float_]
-LinearTarget: TypeAlias = ndarray[float_]
-LinearDatasets: TypeAlias = tuple[
-    LinearFeature, LinearFeature, LinearTarget, LinearTarget
-]
 
 
 def create_linear_datasets(settings: TrainingSettings) -> LinearDatasets:
@@ -25,8 +20,10 @@ def create_linear_datasets(settings: TrainingSettings) -> LinearDatasets:
         max_goals=settings.max_goals,
     )
 
-    X: LinearFeature = dataset[["elo_diff"]].to_numpy(dtype=float_)
-    y: LinearTarget = (dataset["scored"] - dataset["power"]).to_numpy(dtype=float_)
+    X: npt.NDArray[float64] = dataset[["elo_diff"]].to_numpy(dtype=float64)
+    y: npt.NDArray[float64] = (dataset["scored"] - dataset["power"]).to_numpy(
+        dtype=float64
+    )
 
     return train_test_split(
         X,
@@ -37,10 +34,10 @@ def create_linear_datasets(settings: TrainingSettings) -> LinearDatasets:
 
 
 def run_training(
-    X_train: LinearFeature,
-    X_val: LinearFeature,
-    y_train: LinearTarget,
-    y_val: LinearTarget,
+    X_train: npt.NDArray[float64],
+    X_val: npt.NDArray[float64],
+    y_train: npt.NDArray[float64],
+    y_val: npt.NDArray[float64],
 ) -> LinearRegression:
     linear_model: LinearRegression = LinearRegression()
     linear_model.fit(X_train, y_train)

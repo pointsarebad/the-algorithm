@@ -4,8 +4,10 @@ import os
 import pickle
 from abc import ABC
 from pathlib import Path
+from typing import cast
 
 import numpy as np
+import numpy.typing as npt
 from lightgbm.basic import Booster as LgbBooster
 from numpy import ndarray
 from sklearn.linear_model._base import LinearRegression as SklearnRegressor
@@ -26,13 +28,16 @@ class AbstractModelStore(ABC):
     def __init__(self, model) -> None:
         self.model = model
 
-    def _get_inputs(self, home: Team, away: Team) -> type[ndarray]:
+    def _get_inputs(self, home: Team, away: Team) -> npt.NDArray[np.float64]:
         return NotImplemented
 
     def _adjust_powers(
         self, home: Team, away: Team, powers: ScoringPowers
     ) -> ScoringPowers:
-        return max(home.power + powers[0], 0), max(away.power + powers[1], 0)
+        return np.array((
+            max(home.power + powers[0], 0),
+            max(away.power + powers[1], 0),
+        ))
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
         return NotImplemented
@@ -60,11 +65,11 @@ class LinearModelStore(AbstractModelStore):
 
     def _get_inputs(self, home: Team, away: Team) -> LinearFeatures:
         elo_diff: int = home.elo - away.elo
-        return np.array(((elo_diff,), (-elo_diff,)))
+        return np.array(((elo_diff,), (-elo_diff,)), dtype=np.float64)
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
         inputs = self._get_inputs(home=home, away=away)
-        powers: ndarray[np.float_] = self.model.predict(inputs)
+        powers = cast(ScoringPowers, self.model.predict(inputs))
         return self._adjust_powers(home=home, away=away, powers=powers)
 
     @classmethod
@@ -89,11 +94,11 @@ class GbmModelStore(AbstractModelStore):
 
     def _get_inputs(self, home: Team, away: Team) -> GbmFeatures:
         elo_diff: int = home.elo - away.elo
-        return np.array(((elo_diff, False), (-elo_diff, False)))
+        return np.array(((elo_diff, False), (-elo_diff, False)), dtype=np.float64)
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
         inputs = self._get_inputs(home=home, away=away)
-        powers: ndarray[np.float_] = self.model.predict(inputs)
+        powers = cast(ScoringPowers, self.model.predict(inputs))
         return self._adjust_powers(home=home, away=away, powers=powers)
 
     @classmethod
@@ -115,7 +120,7 @@ class BasicModelStore(AbstractModelStore):
     def __init__(self, model) -> None:
         self.model = model
 
-        self.powers = np.array((0, 0))
+        self.powers: ScoringPowers = np.array((0, 0), dtype=np.float64)
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
         return self._adjust_powers(home=home, away=away, powers=self.powers)

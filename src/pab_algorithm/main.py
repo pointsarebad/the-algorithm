@@ -1,8 +1,15 @@
-from pab_algorithm.predictor.model_store import ModelStoreFactory
-from pab_algorithm.predictor.team import Team
+from pab_algorithm.predictor.country_lookup import CountryLookup
+from pab_algorithm.predictor.predictor import ScorePredictor
 
-home = Team(elo=1721.0, power=1.744186046511628, name="Poland", code="PO")
-away = Team(elo=1968.0, power=2.227272727272727, name="Netherlands", code="NL")
 
-store = ModelStoreFactory.load_model_store("gbm")
-print(store.get_powers(home=home, away=away))
+predictor = ScorePredictor(
+    model_type="gbm",
+    default_samples=1000,
+)
+
+lookup = CountryLookup.load_default_lookup()
+
+home = lookup["germany"]
+away = lookup["england"]
+
+print(predictor.display_score(home, away))

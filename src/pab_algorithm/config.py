@@ -17,6 +17,13 @@ ISO_FILE_PATH: Path = DATA_DIR / "iso.csv"
 RESULTS_FILE_PATH: Path = DATA_DIR / "results.csv"
 
 
+class LookupSettings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="country_lookup_")
+
+    min_year: int | None = None
+    max_goals: int | None = None
+
+
 class TrainingSettings(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="model_training_")
 
@@ -56,6 +63,7 @@ class LinearParams(BaseSettings):
 
 
 train_settings = TrainingSettings()
+lookup_settings = LookupSettings()
 
 boost_params = BoosterParams()
 linear_params = LinearParams()

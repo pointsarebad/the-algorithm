@@ -1,10 +1,16 @@
 from typing import Literal, TypeAlias
 
 import numpy as np
+import numpy.typing as npt
 
 ModelType: TypeAlias = Literal["linear", "gbm"]
 
-LinearFeatures: TypeAlias = np.ndarray[np.int_]
-GbmFeatures: TypeAlias = np.ndarray[np.int_, np.bool_]
+LinearDatasets: TypeAlias = tuple[npt.NDArray[np.float64], ...]
 
-ScoringPowers: TypeAlias = tuple[float, float]
+NumLinearFeatures: TypeAlias = Literal[1]
+LinearFeatures: TypeAlias = np.ndarray[NumLinearFeatures, np.dtype[np.float64]]
+
+NumGbmFeatures: TypeAlias = Literal[2]
+GbmFeatures: TypeAlias = np.ndarray[NumGbmFeatures, np.dtype[np.float64]]
+
+ScoringPowers: TypeAlias = np.ndarray[Literal[2], np.dtype[np.float64]]

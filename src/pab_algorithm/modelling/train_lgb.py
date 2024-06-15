@@ -1,6 +1,7 @@
+import numpy.typing as npt
 import pandas as pd
 from lightgbm import Booster, Dataset, train
-from numpy import float_, ndarray
+from numpy import float64
 from pab_algorithm.config import (
     BoosterParams,
     TrainingSettings,
@@ -21,8 +22,12 @@ def create_lgb_datasets(settings: TrainingSettings) -> tuple[Dataset, Dataset]:
         max_goals=settings.max_goals,
     )
 
-    X: ndarray[int, bool] = dataset[["elo_diff", "is_friendly"]].to_numpy()
-    y: ndarray[float] = (dataset["scored"] - dataset["power"]).to_numpy(dtype=float_)
+    X: npt.NDArray[float64] = dataset[["elo_diff", "is_friendly"]].to_numpy(
+        dtype=float64
+    )
+    y: npt.NDArray[float64] = (dataset["scored"] - dataset["power"]).to_numpy(
+        dtype=float64
+    )
 
     X_train, X_val, y_train, y_val = train_test_split(
         X,
