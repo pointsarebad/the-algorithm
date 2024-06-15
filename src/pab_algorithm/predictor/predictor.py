@@ -1,7 +1,5 @@
 import numpy as np
-from lightgbm.basic import Booster as LgbBooster
 from scipy.stats import mode
-from sklearn.linear_model._base import LinearRegression as SklearnRegressor
 
 from pab_algorithm.data_types import ModelType
 from pab_algorithm.predictor.model_store import ModelStore
@@ -13,7 +11,6 @@ class ScorePredictor:
         self,
         default_samples: int = 5,
     ) -> None:
-
         self.default_samples = default_samples
 
         self.models: ModelStore = ModelStore.load_model_store()
