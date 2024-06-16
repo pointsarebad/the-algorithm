@@ -3,7 +3,9 @@ from __future__ import annotations
 import os
 import pickle
 from abc import ABC
+from collections import defaultdict
 from pathlib import Path
+from types import MethodType
 from typing import cast
 
 import numpy as np
@@ -23,9 +25,30 @@ from pab_algorithm.modelling.train_linear import train_linear_from_default
 from pab_algorithm.predictor.team import Team
 
 
+def attach_cache(store: AbstractModelStore) -> AbstractModelStore:
+    store._power_lookup = defaultdict(dict)
+
+    original_get_powers = store.get_powers
+
+    def get_powers(self: AbstractModelStore, home: Team, away: Team) -> ScoringPowers:
+        if home_team := self._power_lookup.get(home.name):
+            if home_power := home_team.get(away.name):
+                return np.array((home_power, self._power_lookup[away.name][home.name]))
+
+        powers = original_get_powers(home, away)
+
+        self._power_lookup[home.name][away.name] = powers[0]
+        self._power_lookup[away.name][home.name] = powers[1]
+
+        return powers
+
+    store.get_powers = MethodType(get_powers, store)  # type: ignore[method-assign]
+    return store
+
+
 class AbstractModelStore(ABC):
-    def __init__(self, model) -> None:
-        self.model = model
+    def __init__(self, *args, **kwargs) -> None:
+        self._power_lookup: defaultdict[str, dict[str, float]]
 
     def _get_inputs(self, home: Team, away: Team) -> npt.NDArray[np.float64]:
         return NotImplemented
@@ -44,20 +67,29 @@ class AbstractModelStore(ABC):
         return NotImplemented
 
     @classmethod
-    def load_model_store(cls) -> AbstractModelStore:
+    def load_model_store(cls, *args, **kwargs) -> AbstractModelStore:
         return NotImplemented
 
 
 class ModelStoreFactory:
     @staticmethod
-    def load_model_store(model_type: ModelType | None = None) -> AbstractModelStore:
+    def load_model_store(
+        model_type: ModelType | None = None,
+        use_cache: bool = False,
+    ) -> AbstractModelStore:
+        model: AbstractModelStore
         match model_type:
             case "linear":
-                return LinearModelStore.load_model_store()
+                model = LinearModelStore.load_model_store()
             case "gbm":
-                return GbmModelStore.load_model_store()
+                model = GbmModelStore.load_model_store()
+            case _:
+                model = BasicModelStore.load_model_store()
 
-        return BasicModelStore.load_model_store()
+        if use_cache:
+            return attach_cache(model)
+
+        return model
 
 
 class LinearModelStore(AbstractModelStore):
@@ -118,14 +150,12 @@ class GbmModelStore(AbstractModelStore):
 
 
 class BasicModelStore(AbstractModelStore):
-    def __init__(self, model) -> None:
-        self.model = model
-
-        self.powers: ScoringPowers = np.array((0, 0), dtype=np.float64)
+    def __init__(self) -> None:
+        self._powers: ScoringPowers = np.array((0, 0), dtype=np.float64)
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
-        return self._adjust_powers(home=home, away=away, powers=self.powers)
+        return self._adjust_powers(home=home, away=away, powers=self._powers)
 
     @classmethod
     def load_model_store(cls) -> BasicModelStore:
-        return cls(model=None)
+        return cls()

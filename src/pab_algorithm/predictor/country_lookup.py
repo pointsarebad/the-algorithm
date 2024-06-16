@@ -31,6 +31,9 @@ class CountryLookup:
     def __iter__(self) -> Iterable[Team]:
         yield from self._countries.values()
 
+    def __len__(self) -> int:
+        return len(self._countries)
+
     @classmethod
     def load_default_lookup(cls) -> CountryLookup:
         dataset: pd.DataFrame = run_country_lookup_pipeline(

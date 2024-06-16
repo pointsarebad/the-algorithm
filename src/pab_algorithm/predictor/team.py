@@ -7,5 +7,3 @@ class Team:
     name: str
     power: float
     elo: int
-
-    grid_index: int | None = None

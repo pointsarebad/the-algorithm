@@ -14,9 +14,11 @@ class ScorePredictor:
         model_type: ModelType | None = None,
         default_samples: int = 5,
         lookup: CountryLookup | None = None,
+        use_cache: bool = False,
     ) -> None:
         self.model: AbstractModelStore = ModelStoreFactory.load_model_store(
-            model_type=model_type
+            model_type=model_type,
+            use_cache=use_cache,
         )
 
         self.default_samples = default_samples
