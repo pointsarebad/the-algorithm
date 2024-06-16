@@ -15,11 +15,11 @@ class ScorePredictor:
         default_samples: int = 5,
         lookup: CountryLookup | None = None,
     ) -> None:
-        self.default_samples = default_samples
-
         self.model: AbstractModelStore = ModelStoreFactory.load_model_store(
             model_type=model_type
         )
+
+        self.default_samples = default_samples
 
         self.lookup = (
             lookup if lookup is not None else CountryLookup.load_default_lookup()
