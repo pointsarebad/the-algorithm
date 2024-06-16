@@ -1,7 +1,7 @@
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.6.0
-    hooks: 
+    hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-added-large-files
@@ -11,23 +11,23 @@ repos:
   - repo: local
     hooks:
       - id: sort_imports
-        name: sort_imports
+        name: sort imports
         entry: ruff check --select=I,F401 --fix
         language: system
-        types_or: 
+        types_or:
           - cython
           - pyi
           - python
         require_serial: true
       - id: ruff_format
-        name: format
+        name: ruff format
         entry: ruff format
         language: system
         types:
           - python
         require_serial: true
       - id: ruff_check
-        name: ruff_check
+        name: ruff check
         entry: ruff check
         language: system
         types:
@@ -41,4 +41,3 @@ repos:
         types:
           - python
         require_serial: true
-        
