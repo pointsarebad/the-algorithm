@@ -9,7 +9,6 @@ from typing import cast
 import numpy as np
 import numpy.typing as npt
 from lightgbm.basic import Booster as LgbBooster
-from numpy import ndarray
 from sklearn.linear_model._base import LinearRegression as SklearnRegressor
 
 from pab_algorithm.config import boost_params, linear_params, train_settings
@@ -34,10 +33,12 @@ class AbstractModelStore(ABC):
     def _adjust_powers(
         self, home: Team, away: Team, powers: ScoringPowers
     ) -> ScoringPowers:
-        return np.array((
-            max(home.power + powers[0], 0),
-            max(away.power + powers[1], 0),
-        ))
+        return np.array(
+            (
+                max(home.power + powers[0], 0),
+                max(away.power + powers[1], 0),
+            )
+        )
 
     def get_powers(self, home: Team, away: Team) -> ScoringPowers:
         return NotImplemented

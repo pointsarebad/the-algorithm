@@ -21,7 +21,7 @@ def get_elos_for_year(year: int = 1910) -> dict[str, str]:
     log.info("Got data for %d", year)
 
     raw_text: str = resp.text
-    rows: list[list[str]] =  [row.split("\t") for row in raw_text.split("\n")]
+    rows: list[list[str]] = [row.split("\t") for row in raw_text.split("\n")]
     return {row[2]: row[3] for row in rows}
 
 
@@ -32,7 +32,7 @@ def get_full_elo(start: int = 1910, end: int = 2024) -> dict[str, dict[str, str]
         elo = get_elos_for_year(year=yr)
         for team, rating in elo.items():
             elos[yr].update({team: rating})
-            
+
     return elos
 
 
@@ -45,6 +45,8 @@ def get_all_elos(file_path: Path) -> None:
 
 if __name__ == "__main__":
     file_path: str | None = os.getenv("ELO_OUTPUT_PATH")
-    
-    output_path: Path = Path(file_path) if file_path else Path(__file__).parent / "elo.csv"
+
+    output_path: Path = (
+        Path(file_path) if file_path else Path(__file__).parent / "elo.csv"
+    )
     get_all_elos(file_path=output_path)

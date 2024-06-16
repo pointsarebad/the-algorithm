@@ -17,6 +17,7 @@ fastapi = "^0.111.0"
 mypy = "^1.10.0"
 ruff = "^0.4.8"
 pydantic-settings = "^2.3.3"
+pre-commit = "^3.7.1"
 
 
 [build-system]

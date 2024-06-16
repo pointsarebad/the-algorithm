@@ -1,0 +1,44 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.6.0
+    hooks: 
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-added-large-files
+      - id: check-json
+      - id: check-toml
+      - id: check-yaml
+  - repo: local
+    hooks:
+      - id: sort_imports
+        name: sort_imports
+        entry: ruff check --select=I,F401 --fix
+        language: system
+        types_or: 
+          - cython
+          - pyi
+          - python
+        require_serial: true
+      - id: ruff_format
+        name: format
+        entry: ruff format
+        language: system
+        types:
+          - python
+        require_serial: true
+      - id: ruff_check
+        name: ruff_check
+        entry: ruff check
+        language: system
+        types:
+          - python
+        require_serial: true
+      - id: mypy
+        name: mypy
+        entry: poetry run mypy
+        files: src
+        language: system
+        types:
+          - python
+        require_serial: true
+        

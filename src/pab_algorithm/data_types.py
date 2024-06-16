@@ -14,3 +14,4 @@ NumGbmFeatures: TypeAlias = Literal[2]
 GbmFeatures: TypeAlias = np.ndarray[NumGbmFeatures, np.dtype[np.float64]]
 
 ScoringPowers: TypeAlias = np.ndarray[Literal[2], np.dtype[np.float64]]
+ScoringSamples: TypeAlias = np.ndarray[Literal[2], np.dtype[np.int32]]

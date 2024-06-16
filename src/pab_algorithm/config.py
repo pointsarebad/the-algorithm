@@ -30,8 +30,8 @@ class TrainingSettings(BaseSettings):
     random_state: int = 444
     train_size: float = 0.85
 
-    min_year: int | None = None
-    max_goals: int | None = None
+    min_year: int | None = 2020
+    max_goals: int | None = 10
 
     save_model: bool = True
     output_model_store_dir: Path = Path(__file__).parent / "model_store"

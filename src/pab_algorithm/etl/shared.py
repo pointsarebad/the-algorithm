@@ -104,21 +104,25 @@ def set_elos(
 
     df_filtered = df_filtered.dropna()
 
-    df_home = pd.DataFrame({
-        "code": df_filtered["home"],
-        "home": df_filtered["home_elo"].astype(int),
-        "away": df_filtered["away_elo"].astype(int),
-        "is_friendly": df_filtered["is_friendly"].astype(bool),
-        "scored": df_filtered["home_score"].astype(int),
-    })
+    df_home = pd.DataFrame(
+        {
+            "code": df_filtered["home"],
+            "home": df_filtered["home_elo"].astype(int),
+            "away": df_filtered["away_elo"].astype(int),
+            "is_friendly": df_filtered["is_friendly"].astype(bool),
+            "scored": df_filtered["home_score"].astype(int),
+        }
+    )
 
-    df_away = pd.DataFrame({
-        "code": df_filtered["away"],
-        "home": df_filtered["away_elo"].astype(int),
-        "away": df_filtered["home_elo"].astype(int),
-        "is_friendly": df_filtered["is_friendly"].astype(bool),
-        "scored": df_filtered["away_score"].astype(int),
-    })
+    df_away = pd.DataFrame(
+        {
+            "code": df_filtered["away"],
+            "home": df_filtered["away_elo"].astype(int),
+            "away": df_filtered["home_elo"].astype(int),
+            "is_friendly": df_filtered["is_friendly"].astype(bool),
+            "scored": df_filtered["away_score"].astype(int),
+        }
+    )
 
     df_set_elos = pd.concat([df_home, df_away], ignore_index=True)
 

@@ -1,15 +1,15 @@
 from pab_algorithm.predictor.country_lookup import CountryLookup
 from pab_algorithm.predictor.predictor import ScorePredictor
 
-
 predictor = ScorePredictor(
     model_type="gbm",
-    default_samples=1000,
+    default_samples=1_000,
 )
 
 lookup = CountryLookup.load_default_lookup()
 
-home = lookup["germany"]
-away = lookup["england"]
+home = "italy"
+away = "spain"
 
+print(predictor.get_win_probs(home, away))
 print(predictor.display_score(home, away))
