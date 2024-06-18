@@ -1,12 +1,12 @@
 from pab_algorithm.predictor.predictor import ScorePredictor
 
-predictor = ScorePredictor(model_type="linear", default_samples=1_000, use_cache=True)
-
-# home = "england"
-# away = "spain"
-
-# print(predictor.get_win_probs(home, away))
-# print(predictor.display_score(home, away))
+predictor = ScorePredictor(
+    model_type="linear",
+    default_samples=1_000,
+    use_cache=True,
+    use_tilting=True,
+    alpha=-0.4,
+)
 
 if __name__ == "__main__":
     while True:
@@ -20,6 +20,6 @@ if __name__ == "__main__":
 
         try:
             print(predictor.display_score(home, away))
-        except:
+        except IndexError:
             print("Not a team")
         print("\n")

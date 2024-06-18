@@ -1,9 +1,9 @@
 import numpy as np
 import numpy.typing as npt
-from scipy.stats import mode
 
 from pab_algorithm.data_types import ModelType, ScoringPowers
 from pab_algorithm.predictor.country_lookup import CountryLookup
+from pab_algorithm.predictor.grids import PointsGrid
 from pab_algorithm.predictor.model_store import AbstractModelStore, ModelStoreFactory
 from pab_algorithm.predictor.team import Team
 
@@ -14,7 +14,11 @@ class ScorePredictor:
         model_type: ModelType | None = None,
         default_samples: int = 5,
         lookup: CountryLookup | None = None,
+        grid_size: int = 10,
+        *,
         use_cache: bool = False,
+        use_tilting: bool = False,
+        alpha: float = 0,
     ) -> None:
         self.model: AbstractModelStore = ModelStoreFactory.load_model_store(
             model_type=model_type,
@@ -27,14 +31,13 @@ class ScorePredictor:
             lookup if lookup is not None else CountryLookup.load_default_lookup()
         )
 
+        self.points_grid: PointsGrid = PointsGrid(grid_size=grid_size)
+        self.use_tilting = use_tilting
+        self.alpha = alpha
+
     @staticmethod
     def get_samples(lam: ScoringPowers, n_samples: int) -> npt.NDArray[np.int32]:
         return np.random.poisson(lam=lam, size=(n_samples, 2)).astype(np.int32)
-
-    @staticmethod
-    def sample(lam: ScoringPowers, n_samples: int) -> tuple[int, int]:
-        samples = ScorePredictor.get_samples(lam=lam, n_samples=n_samples)
-        return tuple(mode(samples, axis=0).mode)
 
     def get_teams(self, home: str, away: str) -> tuple[Team, Team]:
         return self.lookup[home], self.lookup[away]
@@ -49,7 +52,13 @@ class ScorePredictor:
 
         scoring_powers = self.model.get_powers(home=home_team, away=away_team)
 
-        return ScorePredictor.sample(lam=scoring_powers, n_samples=n_samples)
+        samples = ScorePredictor.get_samples(lam=scoring_powers, n_samples=n_samples)
+
+        return self.points_grid.get_score_prediction(
+            samples=samples,
+            apply_tilt=self.use_tilting,
+            alpha=self.alpha,
+        )
 
     def get_win_probs(
         self,
