@@ -1,12 +1,25 @@
-from pab_algorithm.predictor.country_lookup import CountryLookup
 from pab_algorithm.predictor.predictor import ScorePredictor
 
 predictor = ScorePredictor(model_type="linear", default_samples=1_000, use_cache=True)
 
-lookup = CountryLookup.load_default_lookup()
+# home = "england"
+# away = "spain"
 
-home = "italy"
-away = "spain"
+# print(predictor.get_win_probs(home, away))
+# print(predictor.display_score(home, away))
 
-print(predictor.get_win_probs(home, away))
-print(predictor.display_score(away, home))
+if __name__ == "__main__":
+    while True:
+        home = input("Home: ")
+        if home == "exit":
+            break
+
+        away = input("Away: ")
+        if away == "exit":
+            break
+
+        try:
+            print(predictor.display_score(home, away))
+        except:
+            print("Not a team")
+        print("\n")
